@@ -4,8 +4,10 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Address
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -21,46 +23,62 @@ import com.karumi.dexter.listener.single.PermissionListener
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationListener{
+class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationListener {
 
     private lateinit var deviceLocationTracker: DeviceLocationTracker
-    private var currentlLat:Double = 0.0
-    private var currentLng:Double = 0.0
-    private var Country:String = ""
-    private var cityName:String = ""
+    private var currentlLat: Double = 0.0
+    private var currentLng: Double = 0.0
+    private var Country: String = ""
+    private var cityName: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //deviceLocationTracker= DeviceLocationTracker(this, this)
         btnLocation.setOnClickListener {
-            Dexter.withContext(this)
-                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                .withListener(object : PermissionListener {
-                    override fun onPermissionGranted(response: PermissionGrantedResponse) {
-                        checkLocation();
-                    }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (doesUserHavePermission()) {
+                    checkLocation();
+                } else {
+                    Dexter.withContext(this)
+                        .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                        .withListener(object : PermissionListener {
+                            override fun onPermissionGranted(response: PermissionGrantedResponse) {
+                                checkLocation();
+                            }
 
-                    override fun onPermissionDenied(response: PermissionDeniedResponse) {
-                        if (response.isPermanentlyDenied()) {
-                             permissionNotFount();
-                        }
-                    }
+                            override fun onPermissionDenied(response: PermissionDeniedResponse) {
+                                if (response.isPermanentlyDenied()) {
+                                    permissionNotFount();
+                                }
+                            }
 
-                    override fun onPermissionRationaleShouldBeShown( permission: PermissionRequest, token: PermissionToken) {
-                        token.continuePermissionRequest();
-                    }
-                }).check()
+                            override fun onPermissionRationaleShouldBeShown(
+                                permission: PermissionRequest,
+                                token: PermissionToken
+                            ) {
+                                token.continuePermissionRequest();
+                            }
+                        }).check()
+                }
+            }else{
+                checkLocation();
+            }
+
         }
-        }
+    }
 
     private fun permissionNotFount() {
         showSettingsDialog();
     }
 
     private fun checkLocation() {
-        deviceLocationTracker= DeviceLocationTracker(this, this)
-        val toast = Toast.makeText(this, "latitude : "+currentlLat+" longitude : "+currentLng, Toast.LENGTH_LONG)
+        deviceLocationTracker = DeviceLocationTracker(this, this)
+        val toast = Toast.makeText(
+            this,
+            "latitude : " + currentlLat + " longitude : " + currentLng,
+            Toast.LENGTH_LONG
+        )
         toast.show()
 
     }
@@ -74,8 +92,9 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
             Country = countryCode
             cityName = getAddressLine(0)
         }
-        Log.e("XXX","latitude : "+currentlLat+" longitude : "+currentLng)
+        Log.e("XXX", "latitude : " + currentlLat + " longitude : " + currentLng)
     }
+
     private fun showSettingsDialog() {
         val builder: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
         builder.setTitle("Need Permissions")
@@ -89,11 +108,18 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
             DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
         builder.show()
     }
+
     // navigating user to app settings
     private fun openSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri: Uri = Uri.fromParts("package", packageName, null)
         intent.data = uri
         startActivityForResult(intent, 101)
+    }
+
+    private fun doesUserHavePermission(): Boolean {
+        val result: Int =
+            this.checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+        return result == PackageManager.PERMISSION_GRANTED
     }
 }
