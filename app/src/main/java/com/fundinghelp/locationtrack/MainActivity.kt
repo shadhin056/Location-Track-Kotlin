@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
     private var Country: String = ""
     private var cityName: String = ""
     private lateinit var alertDialog : LottieAlertDialog
+    private  var count : Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -78,8 +79,10 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
     }
 
     private fun checkLocation() {
+
         deviceLocationTracker = DeviceLocationTracker(this, this)
         if(currentlLat==0.0){
+            count++;
             alertDialog= LottieAlertDialog.Builder(this,DialogTypes.TYPE_LOADING)
                 .setTitle("Loading")
                 .setDescription("Please Wait")
@@ -87,6 +90,7 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
             alertDialog.setCancelable(false)
             alertDialog.show()
         }else{
+
             val toast = Toast.makeText(
                 this,
                 "latitude : " + currentlLat + " longitude : " + currentLng,
@@ -96,6 +100,15 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
         }
 
 
+    }
+
+    private fun checkLocationFirstTime() {
+            val toast = Toast.makeText(
+                this,
+                "latitude : " + currentlLat + " longitude : " + currentLng,
+                Toast.LENGTH_SHORT
+            )
+            toast.show()
     }
 
 
@@ -109,10 +122,11 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
         }
         Log.e("XXX", "latitude : " + currentlLat + " longitude : " + currentLng)
 
-        if(currentlLat!=0.0){
+        if(currentlLat!=0.0 && count ==1){
             alertDialog.dismiss()
             withContext(Dispatchers.Main) {
-                checkLocation()
+                count=0
+                checkLocationFirstTime()
             }
         }
     }
