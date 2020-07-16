@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        deviceLocationTracker= DeviceLocationTracker(this, this)
+        //deviceLocationTracker= DeviceLocationTracker(this, this)
         btnLocation.setOnClickListener {
             Dexter.withContext(this)
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
     }
 
     private fun checkLocation() {
+        deviceLocationTracker= DeviceLocationTracker(this, this)
         val toast = Toast.makeText(this, "latitude : "+currentlLat+" longitude : "+currentLng, Toast.LENGTH_LONG)
         toast.show()
 
