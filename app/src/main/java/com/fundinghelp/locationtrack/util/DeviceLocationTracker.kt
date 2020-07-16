@@ -124,7 +124,7 @@ class DeviceLocationTracker(context: Context, deviceLocationListener: DeviceLoca
     override fun onProviderEnabled(provider: String) {}
     override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
     interface DeviceLocationListener {
-        fun onDeviceLocationChanged(results: List<Address>?)
+        suspend fun onDeviceLocationChanged(results: List<Address>?)
     }
 
     companion object {

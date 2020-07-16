@@ -23,6 +23,8 @@ import com.karumi.dexter.listener.single.PermissionListener
 import com.labters.lottiealertdialoglibrary.DialogTypes
 import com.labters.lottiealertdialoglibrary.LottieAlertDialog
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationListener {
@@ -88,7 +90,7 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
             val toast = Toast.makeText(
                 this,
                 "latitude : " + currentlLat + " longitude : " + currentLng,
-                Toast.LENGTH_LONG
+                Toast.LENGTH_SHORT
             )
             toast.show()
         }
@@ -97,7 +99,7 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
     }
 
 
-    override fun onDeviceLocationChanged(results: List<Address>?) {
+    override suspend fun onDeviceLocationChanged(results: List<Address>?) {
         val currntLocation = results?.get(0);
         currntLocation?.apply {
             currentlLat = latitude
@@ -109,6 +111,9 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
 
         if(currentlLat!=0.0){
             alertDialog.dismiss()
+            withContext(Dispatchers.Main) {
+                checkLocation()
+            }
         }
     }
 
