@@ -20,6 +20,8 @@ import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
+import com.labters.lottiealertdialoglibrary.DialogTypes
+import com.labters.lottiealertdialoglibrary.LottieAlertDialog
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -30,10 +32,11 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
     private var currentLng: Double = 0.0
     private var Country: String = ""
     private var cityName: String = ""
-
+    private lateinit var alertDialog : LottieAlertDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         //deviceLocationTracker= DeviceLocationTracker(this, this)
         btnLocation.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -74,12 +77,22 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
 
     private fun checkLocation() {
         deviceLocationTracker = DeviceLocationTracker(this, this)
-        val toast = Toast.makeText(
-            this,
-            "latitude : " + currentlLat + " longitude : " + currentLng,
-            Toast.LENGTH_LONG
-        )
-        toast.show()
+        if(currentlLat==0.0){
+            alertDialog= LottieAlertDialog.Builder(this,DialogTypes.TYPE_LOADING)
+                .setTitle("Loading")
+                .setDescription("Please Wait")
+                .build()
+            alertDialog.setCancelable(false)
+            alertDialog.show()
+        }else{
+            val toast = Toast.makeText(
+                this,
+                "latitude : " + currentlLat + " longitude : " + currentLng,
+                Toast.LENGTH_LONG
+            )
+            toast.show()
+        }
+
 
     }
 
@@ -93,6 +106,10 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
             cityName = getAddressLine(0)
         }
         Log.e("XXX", "latitude : " + currentlLat + " longitude : " + currentLng)
+
+        if(currentlLat!=0.0){
+            alertDialog.dismiss()
+        }
     }
 
     private fun showSettingsDialog() {
