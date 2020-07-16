@@ -36,6 +36,9 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
                     }
 
                     override fun onPermissionDenied(response: PermissionDeniedResponse) {
+                        if (response.isPermanentlyDenied()) {
+                             permissionNotFount();
+                        }
                     }
 
                     override fun onPermissionRationaleShouldBeShown( permission: PermissionRequest, token: PermissionToken) {
@@ -44,6 +47,11 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
                 }).check()
         }
         }
+
+    private fun permissionNotFount() {
+        val toast = Toast.makeText(this, "Permission Not Found", Toast.LENGTH_LONG)
+        toast.show()
+    }
 
     private fun checkLocation() {
         val toast = Toast.makeText(this, "latitude : "+currentlLat+" longitude : "+currentLng, Toast.LENGTH_LONG)
