@@ -41,6 +41,10 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
         setContentView(R.layout.activity_main)
 
         //deviceLocationTracker= DeviceLocationTracker(this, this)
+        btnNext.setOnClickListener {
+            val intent = Intent(this, CheckActivity::class.java)
+            startActivity(intent)
+        }
         btnLocation.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (doesUserHavePermission()) {
@@ -88,7 +92,7 @@ class MainActivity : AppCompatActivity(), DeviceLocationTracker.DeviceLocationLi
                 .setDescription("Please Wait")
                 .build()
             alertDialog.setCancelable(false)
-            alertDialog.show()
+           alertDialog.show()
         }else{
 
             val toast = Toast.makeText(
